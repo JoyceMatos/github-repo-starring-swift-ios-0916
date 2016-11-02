@@ -19,26 +19,58 @@ class ReposTableViewController: UITableViewController {
         self.tableView.accessibilityIdentifier = "tableView"
         
         store.getRepositoriesWithCompletion {
-            OperationQueue.main.addOperation({ 
+            OperationQueue.main.addOperation({
                 self.tableView.reloadData()
             })
         }
     }
-
+    
     // MARK: - Table view data source
-
+    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self.store.repositories.count
     }
-
+    
+    func someFunction(success: Bool) {
+        
+    }
+    
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "repoCell", for: indexPath)
-
-        let repository:GithubRepository = self.store.repositories[(indexPath as NSIndexPath).row]
+        
+        let repository: GithubRepository = self.store.repositories[(indexPath as NSIndexPath).row]
         cell.textLabel?.text = repository.fullName
-
+        
         return cell
     }
-
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let repo = store.repositories[indexPath.row]
+        let repoName = repo.fullName
+        
+        ReposDataStore.toggleStarStatus(for: repo) { (isStarred) in
+            
+            switch isStarred {
+            case true:
+                let alertController = UIAlertController(title: "Starred!", message: "You have just starred \(repoName)", preferredStyle: .alert)
+                let defaultAction = UIAlertAction(title: "Dismiss", style: .default, handler: nil)
+                alertController.addAction(defaultAction)
+                
+                self.present(alertController, animated: true, completion: nil)
+                
+            case false:
+                let alertController = UIAlertController(title: "Unstar!", message: "You have unstarred this \(repoName)", preferredStyle: .alert)
+                let defaultAction = UIAlertAction(title: "Dismiss", style: .default, handler: nil)
+                alertController.addAction(defaultAction)
+                
+                self.present(alertController, animated: true, completion: nil)
+            default: "Default"
+                
+            }
+            
+        }
+        
+    }
+    
 }
